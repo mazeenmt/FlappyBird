@@ -1,0 +1,65 @@
+body{
+    background-color: black;
+    display: flex;
+}
+.field{
+    background-image: url("img/sky.png");
+    background-size: cover;
+    background-color: rgb(158, 208, 252);
+    border:3px solid gray;
+    border-radius: 10px;
+    width:1000px;
+    height: 550px;
+    margin:25px auto;
+    position:relative;
+    overflow:hidden;
+}
+.player{
+    position:absolute;
+    top:150px;
+    left:150px;
+    height:75px;
+    width:75px;
+    z-index: 10;
+}
+.player > img{
+}
+.score{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: rgb(255, 81, 0);
+    font-size: 20px;
+    font-family: 'Press Start 2P', cursive;
+    position: absolute;
+    width: 70px;
+    height: 40px;
+    border: 2px solid gray;
+    border-radius: 10px;
+    background-color: white;
+    right: 5px;
+    top: 5px;
+    z-index: 10;
+}
+.reset{
+    border: 2px solid gray;
+    border-radius: 10px;
+    background-color: white;
+    width: 100px;
+    height: 60px;
+    cursor: pointer;
+    color: rgb(255, 81, 0);
+    font-size: 25px;
+    font-family: 'Press Start 2P', cursive;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    left: 45%;
+    top: 40%;
+}
+.reset:hover{
+    background-color: rgb(255, 81, 0);
+    color: white;
+    border: 2px solid white;
+}
