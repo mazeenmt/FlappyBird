@@ -1,5 +1,6 @@
 let field = document.querySelector(".field")
 let scoreHTML = document.querySelector(".score")
+let maxScoreHTML = document.querySelector(".high-score")
 let resetButton = document.querySelector(".reset")
 let listObs = []
 let time = 0
@@ -12,6 +13,7 @@ let player = {
     jumpingTime: 0,
     lose: false,
     score: 0,
+    maxScore: 0,
     icons: (frame)=>`./img/player${frame}.png`,
     frame: 0
 }
@@ -25,10 +27,11 @@ document.addEventListener("keydown", function(e){
     if (e.key === " " && player.y >= 0){
         player.jumpingTime = 0
     }
-    if (e.key === " " && player.lose) reset()
+    if (e.key === "Enter" && player.lose) reset()
 })
 //Reset
-resetButton.addEventListener("click", reset())
+resetButton.addEventListener("click", reset)
+
 function reset(){
     player.lose = false
     player.jumpingTime = 0
@@ -51,11 +54,10 @@ function createObs(x, y, height, pos){
         height: height,
         width: 50
     }
-    document.createElement("div")
     let firstElement = document.createElement("div")
     let secondElement = document.createElement("div")
-    firstElement.style.cssText = `position: absolute; left: ${x}px; top: ${y}px; height: ${height}px; width: ${50}px; background-color: #333;`
-    secondElement.style.cssText = `position: relative; left: ${-8}px; top: ${pos?0:height-42}px; height: ${45}px; width: ${65}px; background-color: blue; z-index: 3; border-radius: 5px;`
+    firstElement.style.cssText = `position: absolute; left: ${x}px; top: ${y}px; height: ${height}px; width: 50px; background-color: #333;`
+    secondElement.style.cssText = `position: relative; left: ${-8}px; top: ${pos?0:height-42}px; height: 45px; width: 65px; background-color: blue; z-index: 3; border-radius: 5px;`
     field.appendChild(firstElement)
     firstElement.appendChild(secondElement)
     return [firstElement, coords]
@@ -99,9 +101,46 @@ function jump(){
         player.y += 4 * player.jumpingTime - 11 // vitesse = accélération(gravity) * temps + vitesseInitiale
     }
 }
+soundJump = false
+const threshold=4
+navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(function(stream) {
+        const audioContext = new AudioContext();
+        const analyser = audioContext.createAnalyser();
+        const microphone = audioContext.createMediaStreamSource(stream);
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        analyser.fftSize = 256;  // Set the sample rate for the analyser
+        microphone.connect(analyser);
+
+        function detectVolume() {
+            analyser.getByteFrequencyData(dataArray);
+            const volume = dataArray.reduce((a, b) => a + b) / dataArray.length;
+            if (volume > threshold) {  // Define a threshold level for sound
+                soundJump = true
+                if (player.y >= 0){
+                    player.jumpingTime = 1
+                }
+                console.log("Sound detected! Volume:", volume);
+            }
+            // Reset soundJump when the volume goes below the threshold
+            if (volume < threshold) {
+                soundJump = false;
+            }
+
+            requestAnimationFrame(detectVolume);
+        }
+
+        detectVolume();
+    })
+    .catch(function(err) {
+        console.error("Error accessing microphone:", err);
+    });
+
 
 //Updates the screen every 15ms
 function update(){
+    maxScoreHTML.innerHTML = "<span>HIGHEST</span><span>" + Math.round(player.maxScore) + "</span>"
     jump()
     listObs.forEach(function(obs){
         //3)Moving the obstacles to the left
@@ -119,11 +158,15 @@ function update(){
         if(player.x === obs[1].x && !player.lose){
             player.score += 0.5
             scoreHTML.textContent = Math.round(player.score)
+            if(player.score>player.maxScore) {
+                player.maxScore = player.score
+            }
         }
         //Reset
         if(player.lose){
             resetButton.style.display = 'flex'
             field.style.opacity = 0.5
+            player.score = 0
         }
     })
     //Display a combined obstacle whenever time reaches 75

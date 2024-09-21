@@ -4,13 +4,11 @@ body{
 }
 .field{
     background-image: url("img/sky.png");
-    background-size: cover;
-    background-color: rgb(158, 208, 252);
     border:3px solid gray;
     border-radius: 10px;
     width:1000px;
     height: 550px;
-    margin:25px auto;
+    margin:50px auto;
     position:relative;
     overflow:hidden;
 }
@@ -22,9 +20,11 @@ body{
     width:75px;
     z-index: 10;
 }
-.player > img{
+.scores{
+    display: flex;
+    width: fit-content;
 }
-.score{
+.score, .high-score{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -40,6 +40,16 @@ body{
     right: 5px;
     top: 5px;
     z-index: 10;
+}
+.high-score{
+    left: 5px;
+    color: red;
+    font-family: 'Fantasy';
+    font-size: 16px;
+    width: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 .reset{
     border: 2px solid gray;
